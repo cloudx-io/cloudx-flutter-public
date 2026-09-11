@@ -100,6 +100,7 @@ class _ArbiterScreenState extends State<ArbiterScreen> {
 
   ArbiterAdEvents _events() {
     return ArbiterAdEvents(
+      onLoadStarted: (platform) => _set(platform, 'loading'),
       onAdLoaded: (platform, detail) => _set(platform, 'loaded: $detail'),
       onAdLoadFailed: (platform, message) =>
           _set(platform, 'load failed: $message'),
@@ -142,11 +143,13 @@ class _ArbiterScreenState extends State<ArbiterScreen> {
   void _load() {
     final controller = _controller;
     if (controller == null) return;
-    setState(() {
-      _cloudX = 'loading';
-      _adMob = 'loading';
-      _arbiter = 'waiting for both sides to settle';
-    });
+    /*
+     * Only the arbiter row is set here. The per-platform rows are left to
+     * onLoadStarted, because load() starts only the side that does not already
+     * hold a fill: marking both as loading would strand the held side's row
+     * there, waiting on a callback that never comes.
+     */
+    setState(() => _arbiter = 'waiting for both sides to settle');
     controller.load();
   }
 

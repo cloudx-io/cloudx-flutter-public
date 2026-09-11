@@ -10,6 +10,7 @@ import 'package:cloudx_flutter/cloudx.dart';
  */
 class ArbiterAdEvents {
   const ArbiterAdEvents({
+    required this.onLoadStarted,
     required this.onAdLoaded,
     required this.onAdLoadFailed,
     required this.onArbiterCompleted,
@@ -21,6 +22,14 @@ class ArbiterAdEvents {
     required this.onAdClicked,
     required this.onRevenueReported,
   });
+
+  /*
+   * A load actually started for this platform. load() starts only the side that
+   * does not already hold a fill, so this is the only honest signal that a
+   * given side is about to report back; assuming both started leaves a status
+   * stuck waiting for a callback that is never coming.
+   */
+  final void Function(CloudXArbiterPlatform platform) onLoadStarted;
 
   final void Function(CloudXArbiterPlatform platform, String detail) onAdLoaded;
   final void Function(CloudXArbiterPlatform platform, String message)

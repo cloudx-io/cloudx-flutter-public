@@ -95,12 +95,14 @@ class ArbiterInterstitialController {
        * interstitials owns it otherwise.
        */
       _claimCloudXListener();
+      events.onLoadStarted(CloudXArbiterPlatform.cloudX);
       CloudX.loadInterstitial(adUnitId: cloudXAdUnitId);
     }
 
     if (_adMobAd == null && !_isLoadingAdMob) {
       _adMobSettled = false;
       _isLoadingAdMob = true;
+      events.onLoadStarted(CloudXArbiterPlatform.adMob);
       _adMobLoad();
     }
 

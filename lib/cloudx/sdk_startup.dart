@@ -44,9 +44,29 @@ class SdkStartup {
     final adMobReady = MobileAds.instance.initialize().then((status) {
       final adapters = status.adapterStatuses.keys.join(', ');
       debugPrint('[CloudXArbiterDemo] AdMob ready (adapters: $adapters)');
+      return true;
+    }).catchError((Object error) {
+      /*
+       * Handled here rather than left to the caller: nothing awaits this
+       * future, so an untouched rejection escapes as an unhandled async error.
+       */
+      debugPrint('[CloudXArbiterDemo] AdMob initialize failed: $error');
+      return false;
     });
 
-    final configuration = await CloudX.initialize(appKey: config.appKey);
+    /*
+     * Caught so this method keeps the promise above. initialize awaits a
+     * platform channel, so a native failure arrives here as a throw rather than
+     * a null, and letting it out would leave the caller's status line sitting
+     * at whatever it was before the call.
+     */
+    CloudXConfiguration? configuration;
+    try {
+      configuration = await CloudX.initialize(appKey: config.appKey);
+    } catch (error) {
+      debugPrint('[CloudXArbiterDemo] CloudX.initialize threw: $error');
+      configuration = null;
+    }
     return SdkStartupResult._(
       tracking: tracking,
       adMobReady: adMobReady,
@@ -70,10 +90,11 @@ class SdkStartupResult {
   final bool cloudXInitialized;
 
   /*
-   * Completes when Google Mobile Ads finishes initializing, for reporting only.
-   * Null when tracking was refused, because init was never started.
+   * Completes with whether Google Mobile Ads finished initializing, for
+   * reporting only, and never rejects. Null when tracking was refused, because
+   * init was never started.
    */
-  final Future<void>? adMobReady;
+  final Future<bool>? adMobReady;
 
   /// Tracking was refused, so no request can carry an IDFA and nothing fills.
   bool get trackingRefused => tracking != TrackingStatus.authorized;

@@ -18,7 +18,7 @@ android {
         /*
          * Bid requests are authorized per app key AND application id, so this
          * has to name the CloudX dashboard app the key in
-         * lib/config/demo_config.dart belongs to. Replace both together.
+         * lib/cloudx/demo_config.dart belongs to. Replace both together.
          */
         applicationId = "io.cloudx.sample"
         // io.cloudx:sdk requires 23; flutter.minSdkVersion is lower on older Flutter.
