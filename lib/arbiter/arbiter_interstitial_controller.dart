@@ -134,8 +134,26 @@ class ArbiterInterstitialController {
     _isShowing = true;
 
     if (winner.platform == CloudXArbiterPlatform.cloudX) {
-      final ready = _loadedCloudXAd != null &&
-          await CloudX.isInterstitialReady(adUnitId: cloudXAdUnitId);
+      final bool ready;
+      try {
+        ready = _loadedCloudXAd != null &&
+            await CloudX.isInterstitialReady(adUnitId: cloudXAdUnitId);
+      } catch (error) {
+        /*
+         * A platform-channel failure surfaces here as a throw. It has to be
+         * caught with the slot claimed above: letting it leave would wedge the
+         * controller, because load() returns early while _isShowing is set and
+         * nothing would arrive to clear it. Reported as a show failure, the
+         * same as one the SDK delivers through the listener.
+         */
+        _log('isInterstitialReady failed: $error');
+        _loadedCloudXAd = null;
+        _isShowing = false;
+        if (!_disposed) {
+          events.onAdShowFailed(CloudXArbiterPlatform.cloudX, '$error');
+        }
+        return false;
+      }
       // The readiness check is a round trip; dispose() can land inside it.
       if (_disposed) {
         _isShowing = false;
@@ -166,7 +184,18 @@ class ArbiterInterstitialController {
         _isShowing = false;
         return false;
       }
-      await ad.show();
+      // Same reason as the readiness call above: a throw here would wedge it.
+      try {
+        await ad.show();
+      } catch (error) {
+        _log('AdMob show failed: $error');
+        _isShowing = false;
+        _disposeAdMobAd();
+        if (!_disposed) {
+          events.onAdShowFailed(CloudXArbiterPlatform.adMob, '$error');
+        }
+        return false;
+      }
       return true;
     }
 
