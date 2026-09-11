@@ -139,7 +139,7 @@ diagnostic.
 |---|---|
 | `CloudX` / `AdMob` | That side's last event: `loading`, `loaded: <network> $<price>`, `load failed: ...`, `showing`, `closed`. |
 | `Arbiter` | `ADMOB (2 bids)`, `CLOUDX (2 bids)`, `no winner (1 bid)`, or `failed: ...`. |
-| `Revenue -> CloudX` | The last AdMob paid event forwarded through `reportRevenueData`, and what that call returned. The return value is not an acceptance: with ILRD telemetry on it is the ILRD emission result, and a revenue of 0.0 is dropped by the price store either way. |
+| `Revenue -> CloudX` | The last AdMob paid event forwarded through `reportRevenueData`, and what that call returned. A `true` does not mean the price was kept; a revenue of 0.0 is discarded. |
 
 If `Arbiter` only ever reads `(1 bid)`, one side is not filling. Look at which
 of the two lines above it says `load failed`; the arbiter is working correctly

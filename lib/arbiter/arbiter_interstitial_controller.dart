@@ -463,10 +463,8 @@ class ArbiterInterstitialController {
       returned = false;
     }
     /*
-     * What the call returned, not an acceptance: with ILRD telemetry enabled
-     * the SDK returns the ILRD emission result rather than whether the price
-     * reached its store, and the store drops any revenue of 0.0 - which is
-     * exactly what Google's test units pay.
+     * What the call returned. A true here does not mean the price was kept: a
+     * revenue of 0.0 is discarded, and that is what Google's test units pay.
      */
     _log(
       'reportRevenueData($valueMicros micros $currencyCode, $precision) '

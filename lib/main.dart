@@ -132,11 +132,7 @@ class _ArbiterScreenState extends State<ArbiterScreen> {
       onAdClosed: (platform) => _set(platform, 'closed'),
       onAdClicked: (platform) => _set(platform, 'clicked'),
       onRevenueReported: (data, returned) => setState(() {
-        /*
-         * The call, not an acceptance. reportRevenueData returns the ILRD
-         * emission result when ILRD telemetry is on, and the price store drops
-         * any revenue of 0.0, which is what Google's test units pay.
-         */
+        // What the call returned. It does not mean the price was kept.
         _revenue =
             '${data.revenue.toStringAsFixed(6)} ${data.currencyCode} '
             'reported (returned $returned)';

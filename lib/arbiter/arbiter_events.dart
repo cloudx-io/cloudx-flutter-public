@@ -47,9 +47,7 @@ class ArbiterAdEvents {
 
   /*
    * The AdMob paid event forwarded to CloudX, with what reportRevenueData
-   * returned. That return value is not an acceptance: with ILRD telemetry
-   * enabled the SDK returns the ILRD emission result, and the price store drops
-   * any revenue of 0.0 regardless.
+   * returned. Report it as the call's result, not as proof the price was kept.
    */
   final void Function(CloudXRevenueData data, bool returned) onRevenueReported;
 }
