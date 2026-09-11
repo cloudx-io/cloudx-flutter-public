@@ -75,9 +75,11 @@ class _ArbiterScreenState extends State<ArbiterScreen> {
     final adMobReady = startup.adMobReady;
     if (adMobReady != null) {
       unawaited(
-        adMobReady.then((_) {
+        adMobReady.then((ready) {
           if (!mounted) return;
-          setState(() => _adMobSdkStatus = 'ready');
+          setState(
+            () => _adMobSdkStatus = ready ? 'ready' : 'initialization failed',
+          );
         }),
       );
     }
