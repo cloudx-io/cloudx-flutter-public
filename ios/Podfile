@@ -44,7 +44,7 @@ target 'Runner' do
   # frees google_mobile_ads from having to match that adapter's exact
   # Google-Mobile-Ads-SDK pin, which is why this app can be on the current
   # google_mobile_ads release.
-  pod 'CloudXCore', '~> 3.8.0'
+  pod 'CloudXCore', '~> 3.9.0'
   pod 'CloudXMetaAdapter', '~> 6.22.0.0'
   pod 'CloudXVungleAdapter', '~> 7.7.6.0'
   pod 'CloudXInMobiAdapter', '~> 11.4.1.0'

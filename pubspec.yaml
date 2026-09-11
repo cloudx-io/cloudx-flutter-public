@@ -17,12 +17,12 @@ dependencies:
 
   # DEV SETTING - not the published form. The SDK is served from the local pub
   # host (flutter/scripts/serve-local-pub.py in cloudx-io/mobile) until
-  # cloudx_flutter 3.8.0 is on pub.dev. Replace this whole block with
-  # `cloudx_flutter: ^3.8.0` once it is published.
+  # cloudx_flutter 3.9.0 is on pub.dev. Replace this whole block with
+  # `cloudx_flutter: ^3.9.0` once it is published.
   cloudx_flutter:
     # ignore: secure_pubspec_urls
     hosted: http://127.0.0.1:8080
-    version: ^3.8.0
+    version: ^3.9.0
 
   # AdMob is the second bidder in every arbiter round. Pinned exactly so a
   # clone reproduces the same native graph.

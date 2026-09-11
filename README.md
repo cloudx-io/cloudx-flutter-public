@@ -100,9 +100,9 @@ Details worth knowing:
 
 | Pin | Version | Why |
 |---|---|---|
-| `cloudx_flutter` | 3.8.0 | The plugin. Brings the native SDKs with it. |
+| `cloudx_flutter` | 3.9.0 | The plugin. Brings the native SDKs with it. |
 | `io.cloudx:sdk` | 4.7.0 | Android native SDK. Declared explicitly so the version is visible in one place. |
-| `CloudXCore` | 3.8.0 | iOS native SDK. |
+| `CloudXCore` | 3.9.0 | iOS native SDK. |
 | `google_mobile_ads` | 9.1.0 exactly | AdMob is the second bidder. Exact, so a clone reproduces the same native graph. |
 | `app_tracking_transparency` | ^2.0.4 | The ATT prompt. |
 
