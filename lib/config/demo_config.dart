@@ -14,6 +14,14 @@ import 'dart:io';
  *
  * The AdMob unit ids are Google's public test units, so the AdMob side of every
  * round fills without an Ad Manager account of your own.
+ *
+ * The AdMob APPLICATION id is not here and cannot be: Google reads it from the
+ * native files before any Dart runs, so it lives in
+ * android/app/src/main/AndroidManifest.xml as the
+ * com.google.android.gms.ads.APPLICATION_ID meta-data and in
+ * ios/Runner/Info.plist as GADApplicationIdentifier. The Google Mobile Ads SDK
+ * throws at startup when it is absent. Only the per-placement AdMob unit ids
+ * below are set from Dart.
  */
 class DemoConfig {
   const DemoConfig._({
