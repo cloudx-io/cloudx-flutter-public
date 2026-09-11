@@ -77,7 +77,4 @@ class SdkStartupResult {
 
   /// Tracking was refused, so no request can carry an IDFA and nothing fills.
   bool get trackingRefused => tracking != TrackingStatus.authorized;
-
-  /// Both gates passed: ads can be loaded.
-  bool get canLoadAds => !trackingRefused && cloudXInitialized;
 }
