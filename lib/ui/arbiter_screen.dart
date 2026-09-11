@@ -62,9 +62,15 @@ class _ArbiterScreenState extends State<ArbiterScreen> {
     setState(() => _trackingStatus = startup.tracking.name);
 
     if (startup.trackingRefused) {
-      setState(
-        () => _cloudXSdkStatus = 'tracking not authorized - ads cannot load',
-      );
+      /*
+       * Both SDK rows, not just CloudX: run() returns before it starts Google
+       * Mobile Ads, so leaving that row at its initial "initializing" would
+       * have it waiting on an init that was never started.
+       */
+      setState(() {
+        _cloudXSdkStatus = 'tracking not authorized - ads cannot load';
+        _adMobSdkStatus = 'not started - tracking not authorized';
+      });
       return;
     }
 
