@@ -22,6 +22,9 @@ import 'dart:io';
  * ios/Runner/Info.plist as GADApplicationIdentifier. The Google Mobile Ads SDK
  * throws at startup when it is absent. Only the per-placement AdMob unit ids
  * below are set from Dart.
+ *
+ * The first file to edit. Copy it, or drop it and hand your own ids to
+ * ArbiterInterstitialController directly.
  */
 class DemoConfig {
   const DemoConfig._({

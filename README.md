@@ -35,15 +35,40 @@ compete.
 
 ## What is in here
 
+Copy [`lib/cloudx/`](lib/cloudx). Those five files are the whole integration,
+and none of them builds a widget. Everything outside that folder is this demo's
+own scaffolding.
+
 | File | What it is |
 |---|---|
-| [`lib/arbiter/arbiter_interstitial_controller.dart`](lib/arbiter/arbiter_interstitial_controller.dart) | The integration. The whole load/arbitrate/show cycle and both SDKs' calls, in one file. |
-| [`lib/arbiter/arbiter_events.dart`](lib/arbiter/arbiter_events.dart) | The callbacks the controller reports through. |
-| [`lib/config/demo_config.dart`](lib/config/demo_config.dart) | App key and ad unit ids, per platform. The first file to edit. |
-| [`lib/tracking_gate.dart`](lib/tracking_gate.dart) | The iOS App Tracking Transparency gate. |
-| [`lib/main.dart`](lib/main.dart) | The demo screen. Not part of the integration: it only makes the flow visible. |
+| [`lib/cloudx/arbiter_interstitial_controller.dart`](lib/cloudx/arbiter_interstitial_controller.dart) | The integration. The whole load/arbitrate/show cycle and both SDKs' calls, in one file. |
+| [`lib/cloudx/arbiter_events.dart`](lib/cloudx/arbiter_events.dart) | The callbacks the controller reports through. |
+| [`lib/cloudx/sdk_startup.dart`](lib/cloudx/sdk_startup.dart) | Brings both SDKs up, in the order they have to come up in. |
+| [`lib/cloudx/tracking_gate.dart`](lib/cloudx/tracking_gate.dart) | The iOS App Tracking Transparency gate. |
+| [`lib/cloudx/demo_config.dart`](lib/cloudx/demo_config.dart) | App key and ad unit ids, per platform. The first file to edit. |
+| [`lib/ui/arbiter_screen.dart`](lib/ui/arbiter_screen.dart) | Demo-only UI. Ignore it when reading the integration. |
+| [`lib/main.dart`](lib/main.dart) | `runApp`, nothing else. |
 
-A real integration copies the first three files and calls `load()` and `show()`.
+**Take fewer and it will not build.** The controller reports through
+`arbiter_events.dart`, and `sdk_startup.dart` calls `tracking_gate.dart`. If
+your app already initializes CloudX and answers the ATT prompt, drop those last
+two and keep the first three.
+
+Read them in this order:
+
+1. [`demo_config.dart`](lib/cloudx/demo_config.dart) - the ids, and what has to
+   match what
+2. [`sdk_startup.dart`](lib/cloudx/sdk_startup.dart) - why ATT comes before
+   `CloudX.initialize`
+3. [`arbiter_interstitial_controller.dart`](lib/cloudx/arbiter_interstitial_controller.dart)
+   - the cycle itself
+
+**No CloudX or AdMob call lives outside `lib/cloudx/`.** That is checkable:
+`grep -rn "CloudX\.\|MobileAds\." lib/ui lib/main.dart` returns only two
+strings printed on screen. The integration files import
+`package:flutter/foundation.dart` for logging, and `tracking_gate.dart` also
+needs `package:flutter/widgets.dart` to wait for the app to become active before
+prompting, but none of them imports `material.dart` or builds a widget.
 
 ## The cycle
 
@@ -82,7 +107,7 @@ Details worth knowing:
    can turn it on. You can confirm it from the logs at startup:
    `[InitializationService] Arbiter enabled: https://sdk.cloudx.io/arbitration`.
 2. **Match your app key to your bundle id.** Bid requests are authorized per app
-   key AND bundle id. Change `lib/config/demo_config.dart`, the Android
+   key AND bundle id. Change `lib/cloudx/demo_config.dart`, the Android
    `applicationId` and the iOS `PRODUCT_BUNDLE_IDENTIFIER` together, or you get
    no fill and no error that says why.
 3. **Set the Google Mobile Ads application id natively**, in

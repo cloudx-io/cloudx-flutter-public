@@ -19,8 +19,10 @@ import 'arbiter_events.dart';
  * controller forwards after every AdMob impression (reportRevenueData). That
  * forwarding is a required part of the integration, not telemetry.
  *
- * This file is the whole integration. Copy it, arbiter_events.dart and your own
- * ad unit ids into your app and you have the flow.
+ * Copy this file, arbiter_events.dart for the callbacks it reports through, and
+ * demo_config.dart for your own ids. Taking this file alone leaves nothing to
+ * report to, and it will not compile. Add sdk_startup.dart and
+ * tracking_gate.dart if you do not already bring the two SDKs up yourself.
  */
 class ArbiterInterstitialController {
   ArbiterInterstitialController({

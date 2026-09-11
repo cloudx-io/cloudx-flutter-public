@@ -13,6 +13,12 @@ import 'package:flutter/widgets.dart';
  * should state rather than hide behind an empty ad slot.
  *
  * iOS only. Android has no ATT and reports authorized straight away.
+ *
+ * Copy this file with sdk_startup.dart, which calls it. This is the one file in
+ * lib/cloudx/ that needs Flutter for something other than logging: it waits on
+ * AppLifecycleListener, because iOS refuses to present the prompt while the app
+ * is still becoming active and answers notDetermined instead of showing
+ * anything. It still builds no widgets.
  */
 class TrackingGate {
   const TrackingGate._();

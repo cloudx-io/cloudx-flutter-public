@@ -4,6 +4,9 @@ import 'package:cloudx_flutter/cloudx.dart';
  * What the controller reports back. The demo screen turns these into status
  * lines; a real integration can ignore most of them and keep only the ones it
  * acts on.
+ *
+ * Copy this file with arbiter_interstitial_controller.dart. Every callback
+ * names the platform it came from, so one handler can serve both.
  */
 class ArbiterAdEvents {
   const ArbiterAdEvents({
