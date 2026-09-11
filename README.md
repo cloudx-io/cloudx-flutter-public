@@ -27,6 +27,12 @@ Two rules are easy to miss, and both are in the code:
 > That call is part of the integration, not telemetry. Skip it and the AdMob
 > side of every auction is priced blind.
 
+Which is why the AdMob ids checked in here make a poor price demo: Google's test
+units report a revenue of 0.0, the price store drops any revenue of 0.0, and the
+AdMob bid therefore reaches the arbiter with no price at all. Expect CloudX to
+lose those rounds. Point the demo at a real AdMob unit that pays to see prices
+compete.
+
 ## What is in here
 
 | File | What it is |
@@ -100,6 +106,12 @@ Details worth knowing:
 | `google_mobile_ads` | 9.1.0 exactly | AdMob is the second bidder. Exact, so a clone reproduces the same native graph. |
 | `app_tracking_transparency` | ^2.0.4 | The ATT prompt. |
 
+Dart 3.12 and Flutter 3.44 are the floors, set by `webview_flutter_android` and
+`webview_flutter_wkwebview`, which `google_mobile_ads` 9.1.0 pulls in.
+
+The Xcode project carries no `DEVELOPMENT_TEAM`, so signing stays on automatic
+and picks your own team. Set it in Xcode before a device or archive build.
+
 **`CloudXGoogleWaterfallAdapter` / `io.cloudx:adapter-googlewaterfall` is
 deliberately absent.** It runs AdMob demand *inside* the CloudX auction, which
 is the opposite of what this demo shows: here AdMob is an external bid competing
@@ -127,7 +139,7 @@ diagnostic.
 |---|---|
 | `CloudX` / `AdMob` | That side's last event: `loading`, `loaded: <network> $<price>`, `load failed: ...`, `showing`, `closed`. |
 | `Arbiter` | `ADMOB (2 bids)`, `CLOUDX (2 bids)`, `no winner (1 bid)`, or `failed: ...`. |
-| `Revenue -> CloudX` | The last AdMob paid event forwarded through `reportRevenueData`, and whether the SDK accepted it. |
+| `Revenue -> CloudX` | The last AdMob paid event forwarded through `reportRevenueData`, and what that call returned. The return value is not an acceptance: with ILRD telemetry on it is the ILRD emission result, and a revenue of 0.0 is dropped by the price store either way. |
 
 If `Arbiter` only ever reads `(1 bid)`, one side is not filling. Look at which
 of the two lines above it says `load failed`; the arbiter is working correctly

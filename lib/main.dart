@@ -131,10 +131,15 @@ class _ArbiterScreenState extends State<ArbiterScreen> {
           _set(platform, 'show failed: $message'),
       onAdClosed: (platform) => _set(platform, 'closed'),
       onAdClicked: (platform) => _set(platform, 'clicked'),
-      onRevenueReported: (data, accepted) => setState(() {
+      onRevenueReported: (data, returned) => setState(() {
+        /*
+         * The call, not an acceptance. reportRevenueData returns the ILRD
+         * emission result when ILRD telemetry is on, and the price store drops
+         * any revenue of 0.0, which is what Google's test units pay.
+         */
         _revenue =
             '${data.revenue.toStringAsFixed(6)} ${data.currencyCode} '
-            'accepted=$accepted';
+            'reported (returned $returned)';
       }),
     );
   }
@@ -181,6 +186,17 @@ class _ArbiterScreenState extends State<ArbiterScreen> {
   Widget build(BuildContext context) {
     final controller = _controller;
     final winner = controller?.preparedWinner;
+    /*
+     * load() is a no-op while an ad is showing, and with a winner already
+     * stored it has nothing left to load, so the button is off in both cases: a
+     * tap would set the rows to "loading" with no callback coming to clear
+     * them.
+     */
+    final canLoad = _ready &&
+        controller != null &&
+        !controller.isBusy &&
+        !controller.isShowing &&
+        winner == null;
 
     return Scaffold(
       appBar: AppBar(title: const Text('CloudX Trusted Arbiter')),
@@ -202,8 +218,7 @@ class _ArbiterScreenState extends State<ArbiterScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 ElevatedButton(
-                  onPressed:
-                      !_ready || (controller?.isBusy ?? true) ? null : _load,
+                  onPressed: canLoad ? _load : null,
                   child: Text(
                     (controller?.isBusy ?? false) ? 'Loading...' : 'Load both',
                   ),

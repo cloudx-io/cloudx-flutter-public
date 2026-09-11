@@ -73,6 +73,11 @@
 	<string>This app uses tracking to provide personalized ads and improve your experience.</string>
 	<key>SKAdNetworkItems</key>
 	<array>
+		<!-- Google. Required by google_mobile_ads; the rest are the CloudX adapters. -->
+		<dict>
+			<key>SKAdNetworkIdentifier</key>
+			<string>cstr6suwn9.skadnetwork</string>
+		</dict>
 		<dict>
 			<key>SKAdNetworkIdentifier</key>
 			<string>ggvn48r87g.skadnetwork</string>

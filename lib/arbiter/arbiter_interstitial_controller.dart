@@ -124,16 +124,26 @@ class ArbiterInterstitialController {
       return false;
     }
     _nextWinner = null;
+    /*
+     * Claim the show slot before the readiness round trip below, not after it.
+     * A second tap landing inside that await would otherwise pass the guard
+     * above, and a load() would re-arbitrate the fills this call is about to
+     * consume and store a winner pointing at a consumed ad. Every path that
+     * does not reach a show clears the flag again.
+     */
+    _isShowing = true;
 
     if (winner.platform == CloudXArbiterPlatform.cloudX) {
       final ready = _loadedCloudXAd != null &&
           await CloudX.isInterstitialReady(adUnitId: cloudXAdUnitId);
       // The readiness check is a round trip; dispose() can land inside it.
       if (_disposed) {
+        _isShowing = false;
         return false;
       }
       if (!ready) {
         _loadedCloudXAd = null;
+        _isShowing = false;
         return false;
       }
       /*
@@ -143,7 +153,6 @@ class ArbiterInterstitialController {
        * controller stuck mid-show with no way back.
        */
       _claimCloudXListener();
-      _isShowing = true;
       CloudX.showInterstitial(
         adUnitId: cloudXAdUnitId,
         placement: 'arbiter_interstitial',
@@ -154,13 +163,14 @@ class ArbiterInterstitialController {
     if (winner.platform == CloudXArbiterPlatform.adMob) {
       final ad = _adMobAd;
       if (ad == null) {
+        _isShowing = false;
         return false;
       }
-      _isShowing = true;
       await ad.show();
       return true;
     }
 
+    _isShowing = false;
     return false;
   }
 
@@ -416,19 +426,25 @@ class ArbiterInterstitialController {
      * Called from Google's paid-event callback, so nothing awaits this; a throw
      * would escape as an unhandled async error rather than reaching a caller.
      */
-    bool accepted;
+    bool returned;
     try {
-      accepted = await CloudX.reportRevenueData(data);
+      returned = await CloudX.reportRevenueData(data);
     } catch (error) {
       _log('reportRevenueData failed: $error');
-      accepted = false;
+      returned = false;
     }
+    /*
+     * What the call returned, not an acceptance: with ILRD telemetry enabled
+     * the SDK returns the ILRD emission result rather than whether the price
+     * reached its store, and the store drops any revenue of 0.0 - which is
+     * exactly what Google's test units pay.
+     */
     _log(
       'reportRevenueData($valueMicros micros $currencyCode, $precision) '
-      'accepted=$accepted',
+      'returned=$returned',
     );
     if (!_disposed) {
-      events.onRevenueReported(data, accepted);
+      events.onRevenueReported(data, returned);
     }
   }
 

@@ -4,10 +4,12 @@ publish_to: 'none'
 
 version: 1.0.0+1
 
-# google_mobile_ads 9.1.0 sets both floors.
+# The floors the resolved graph needs: google_mobile_ads 9.1.0 pulls
+# webview_flutter_android 4.14.1 and webview_flutter_wkwebview 3.26.1, which
+# require Dart 3.12 and Flutter 3.44. pubspec.lock records the same pair.
 environment:
-  sdk: '>=3.10.0 <4.0.0'
-  flutter: ">=3.38.1"
+  sdk: '>=3.12.0 <4.0.0'
+  flutter: ">=3.44.0"
 
 dependencies:
   flutter:

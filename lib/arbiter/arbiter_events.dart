@@ -45,6 +45,11 @@ class ArbiterAdEvents {
   final void Function(CloudXArbiterPlatform platform) onAdClosed;
   final void Function(CloudXArbiterPlatform platform) onAdClicked;
 
-  /// The AdMob paid event forwarded to CloudX, and whether the SDK accepted it.
-  final void Function(CloudXRevenueData data, bool accepted) onRevenueReported;
+  /*
+   * The AdMob paid event forwarded to CloudX, with what reportRevenueData
+   * returned. That return value is not an acceptance: with ILRD telemetry
+   * enabled the SDK returns the ILRD emission result, and the price store drops
+   * any revenue of 0.0 regardless.
+   */
+  final void Function(CloudXRevenueData data, bool returned) onRevenueReported;
 }
