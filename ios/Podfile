@@ -1,0 +1,74 @@
+# Flutter 3.47 ships an engine with a 15.0 deployment floor; CloudXCore itself supports 13.0.
+platform :ios, '15.0'
+
+# CocoaPods analytics sends network stats synchronously affecting flutter build latency.
+ENV['COCOAPODS_DISABLE_STATS'] = 'true'
+
+project 'Runner', {
+  'Debug' => :debug,
+  'Profile' => :release,
+  'Release' => :release,
+}
+
+def flutter_root
+  generated_xcode_build_settings_path = File.expand_path(File.join('..', 'Flutter', 'Generated.xcconfig'), __FILE__)
+  unless File.exist?(generated_xcode_build_settings_path)
+    raise "#{generated_xcode_build_settings_path} must exist. If you're running pod install manually, make sure flutter pub get is executed first"
+  end
+
+  File.foreach(generated_xcode_build_settings_path) do |line|
+    matches = line.match(/FLUTTER_ROOT\=(.*)/)
+    return matches[1].strip if matches
+  end
+  raise "FLUTTER_ROOT not found in #{generated_xcode_build_settings_path}. Try deleting Generated.xcconfig, then run flutter pub get"
+end
+
+require File.expand_path(File.join('packages', 'flutter_tools', 'bin', 'podhelper'), flutter_root)
+
+flutter_ios_podfile_setup
+
+target 'Runner' do
+  use_frameworks! :linkage => :static
+  use_modular_headers!
+
+  flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
+
+  # CloudX SDK and adapters. Adapters version independently of CloudXCore, on a
+  # <network-sdk-version>.<adapter-revision> scheme. Take only the networks your
+  # dashboard actually serves.
+  #
+  # CloudXGoogleWaterfallAdapter is deliberately absent. It runs AdMob demand
+  # INSIDE the CloudX auction, which is the opposite of what this demo shows:
+  # here AdMob is an external bid competing against CloudX through the arbiter.
+  # Shipping both would make the two bids the same demand. Leaving it out also
+  # frees google_mobile_ads from having to match that adapter's exact
+  # Google-Mobile-Ads-SDK pin, which is why this app can be on the current
+  # google_mobile_ads release.
+  pod 'CloudXCore', '~> 3.8.0'
+  pod 'CloudXMetaAdapter', '~> 6.22.0.0'
+  pod 'CloudXVungleAdapter', '~> 7.7.6.0'
+  pod 'CloudXInMobiAdapter', '~> 11.4.1.0'
+  pod 'CloudXMintegralAdapter', '~> 8.1.6.0'
+  pod 'CloudXUnityAdsAdapter', '~> 4.19.0.0'
+  pod 'CloudXMagniteAdapterV2', '~> 1.0.0.1'
+  pod 'CloudXMobileFuseAdapter', '~> 1.11.0.1'
+  pod 'CloudXMolocoAdapter', '~> 4.8.0.0'
+  pod 'CloudXVerveAdapter', '~> 3.9.0.0'
+  pod 'CloudXDigitalTurbineAdapter', '~> 8.4.8.0'
+  pod 'CloudXPangleAdapter', '~> 8.2.0.7.0'
+  pod 'CloudXTaurusXAdapter', '~> 1.18.2.0'
+
+  target 'RunnerTests' do
+    inherit! :search_paths
+  end
+end
+
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    flutter_additional_ios_build_settings(target)
+
+    target.build_configurations.each do |config|
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.0'
+    end
+  end
+end
