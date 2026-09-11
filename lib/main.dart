@@ -168,7 +168,26 @@ class _ArbiterScreenState extends State<ArbiterScreen> {
     final controller = _controller;
     if (controller == null) return;
     final shown = await controller.show();
-    if (!mounted || shown) return;
+    if (!mounted) return;
+    if (shown) {
+      /*
+       * Rebuild now rather than waiting for the shown callback, so the button
+       * goes flat the moment the show is under way. Until it does, the stale
+       * button is still live and a second tap lands on the branch below.
+       */
+      setState(() {});
+      return;
+    }
+    /*
+     * show() returns false for two different things, and the difference matters
+     * here: a winner that went stale, or a show already in progress that a
+     * second tap reached. isShowing tells them apart. Reloading on the second
+     * would set the rows to "loading" while load() declines to start anything,
+     * leaving the screen describing work that is not happening.
+     */
+    if (controller.isShowing) {
+      return;
+    }
     /*
      * The winner went stale between the arbiter result and the tap, so there is
      * nothing to show. A publisher would carry on with the game here; the demo
@@ -221,7 +240,9 @@ class _ArbiterScreenState extends State<ArbiterScreen> {
                 ),
                 const SizedBox(width: 12),
                 ElevatedButton(
-                  onPressed: winner == null ? null : _show,
+                  onPressed: winner == null || (controller?.isShowing ?? false)
+                      ? null
+                      : _show,
                   child: Text(
                     winner == null ? 'Show winner' : 'Show winner ($winner)',
                   ),
