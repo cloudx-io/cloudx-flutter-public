@@ -45,7 +45,7 @@ packages:
     dependency: "direct main"
     description:
       name: cloudx_flutter
-      sha256: e35c268c0527c830cdad23599078f9b1f7b56c2b05eb99b64f4664f89308a368
+      sha256: ef3b19a62ff9ef400ee5ae4cdb90ecccb0c203fe64aaf232521b0938d8bfb2ed
       url: "http://127.0.0.1:8080"
     source: hosted
     version: "3.9.0"
@@ -143,10 +143,10 @@ packages:
     dependency: transitive
     description:
       name: meta
-      sha256: c82594181e3312f3d0695fc95aaaf7758d75b8d4ae2bbecf223b9fd5109a059d
+      sha256: "307249ce4ff29d58a18e97f6345f539382eb9c9c29ecda628900f31de0443dd9"
       url: "https://pub.dev"
     source: hosted
-    version: "1.18.3"
+    version: "1.19.0"
   path:
     dependency: transitive
     description:
@@ -220,10 +220,10 @@ packages:
     dependency: transitive
     description:
       name: vector_math
-      sha256: "1d774bbdf6b72a0b12122fc1560c9c2d2a67db5a4a4cc2bd8a5c990ab20e3188"
+      sha256: f36f9f3be64c6198714492bb455c11056e33e2f85d9a0b676a48301e44fdcf47
       url: "https://pub.dev"
     source: hosted
-    version: "2.4.0"
+    version: "2.4.2"
   vm_service:
     dependency: transitive
     description:

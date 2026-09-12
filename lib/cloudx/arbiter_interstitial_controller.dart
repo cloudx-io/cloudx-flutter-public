@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import 'arbiter_events.dart';
+import 'cloudx_failure_text.dart';
 
 /*
  * Trusted Arbiter for interstitials. CloudX and AdMob load in parallel, the
@@ -19,7 +20,8 @@ import 'arbiter_events.dart';
  * controller forwards after every AdMob impression (reportRevenueData). That
  * forwarding is a required part of the integration, not telemetry.
  *
- * Copy this file, arbiter_events.dart for the callbacks it reports through, and
+ * Copy this file, arbiter_events.dart for the callbacks it reports through,
+ * cloudx_failure_text.dart for the failure lines it builds, and
  * demo_config.dart for your own ids. Taking this file alone leaves nothing to
  * report to, and it will not compile. Add sdk_startup.dart and
  * tracking_gate.dart if you do not already bring the two SDKs up yourself.
@@ -294,11 +296,17 @@ class ArbiterInterstitialController {
     CloudX.setInterstitialListener(
       CloudXInterstitialListener(
         onAdLoaded: _handleCloudXLoaded,
+        /*
+         * The code name goes into the reported line, not just the message.
+         * Almost every failure this demo sees is a no-fill, and NO_FILL[302] is
+         * what tells it apart from an ad unit that is wrong for the app key -
+         * they carry different codes but similar-looking messages.
+         */
         onAdLoadFailed: (adUnitId, error) =>
-            _handleCloudXLoadFailed(adUnitId, error.message),
+            _handleCloudXLoadFailed(adUnitId, CloudXFailureText.of(error)),
         onAdDisplayed: _handleCloudXShown,
         onAdDisplayFailed: (ad, error) =>
-            _handleCloudXShowFailed(ad, error.message),
+            _handleCloudXShowFailed(ad, CloudXFailureText.of(error)),
         onAdHidden: _handleCloudXHidden,
         onAdClicked: _handleCloudXClicked,
       ),

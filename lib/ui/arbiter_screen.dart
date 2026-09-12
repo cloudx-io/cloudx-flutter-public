@@ -91,7 +91,16 @@ class _ArbiterScreenState extends State<ArbiterScreen> {
     }
 
     if (!startup.cloudXInitialized) {
-      setState(() => _cloudXSdkStatus = 'initialization failed');
+      /*
+       * The reason comes from the SDK, not from here: initialize is the one
+       * call that returns its own error code and message, and a demo that
+       * printed only "failed" would hide whether the app key or the network
+       * was at fault.
+       */
+      final failure = startup.cloudXFailure;
+      setState(() => _cloudXSdkStatus = failure == null
+          ? 'initialization failed'
+          : 'initialization failed: $failure');
       return;
     }
 

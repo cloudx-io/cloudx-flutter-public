@@ -35,7 +35,7 @@ compete.
 
 ## What is in here
 
-Copy [`lib/cloudx/`](lib/cloudx). Those five files are the whole integration,
+Copy [`lib/cloudx/`](lib/cloudx). Those six files are the whole integration,
 and none of them builds a widget. Everything outside that folder is this demo's
 own scaffolding.
 
@@ -45,14 +45,16 @@ own scaffolding.
 | [`lib/cloudx/arbiter_events.dart`](lib/cloudx/arbiter_events.dart) | The callbacks the controller reports through. |
 | [`lib/cloudx/sdk_startup.dart`](lib/cloudx/sdk_startup.dart) | Brings both SDKs up, in the order they have to come up in. |
 | [`lib/cloudx/tracking_gate.dart`](lib/cloudx/tracking_gate.dart) | The iOS App Tracking Transparency gate. |
+| [`lib/cloudx/cloudx_failure_text.dart`](lib/cloudx/cloudx_failure_text.dart) | One line out of a CloudX failure, carrying the SDK's own name for the error code. |
 | [`lib/cloudx/demo_config.dart`](lib/cloudx/demo_config.dart) | App key and ad unit ids, per platform. The first file to edit. |
 | [`lib/ui/arbiter_screen.dart`](lib/ui/arbiter_screen.dart) | Demo-only UI. Ignore it when reading the integration. |
 | [`lib/main.dart`](lib/main.dart) | `runApp`, nothing else. |
 
 **Take fewer and it will not build.** The controller reports through
-`arbiter_events.dart`, and `sdk_startup.dart` calls `tracking_gate.dart`. If
-your app already initializes CloudX and answers the ATT prompt, drop those last
-two and keep the first three.
+`arbiter_events.dart`, both it and `sdk_startup.dart` format failures through
+`cloudx_failure_text.dart`, and `sdk_startup.dart` calls `tracking_gate.dart`.
+If your app already initializes CloudX and answers the ATT prompt, drop
+`sdk_startup.dart` and `tracking_gate.dart` and keep the rest.
 
 Read them in this order:
 
@@ -108,8 +110,8 @@ Details worth knowing:
    `[InitializationService] Arbiter enabled: https://sdk.cloudx.io/arbitration`.
 2. **Match your app key to your bundle id.** Bid requests are authorized per app
    key AND bundle id. Change `lib/cloudx/demo_config.dart`, the Android
-   `applicationId` and the iOS `PRODUCT_BUNDLE_IDENTIFIER` together, or you get
-   no fill and no error that says why.
+   `applicationId` and the iOS `PRODUCT_BUNDLE_IDENTIFIER` together, or every
+   round comes back `NO_FILL[302]` with nothing to say the pairing is why.
 3. **Set the Google Mobile Ads application id natively**, in
    `android/app/src/main/AndroidManifest.xml` and `ios/Runner/Info.plist`. The
    Google SDK throws at startup when it is absent.
@@ -147,6 +149,14 @@ The adapter list in `android/app/build.gradle.kts` and `ios/Podfile` is the full
 CloudX set. Take only the networks your dashboard actually serves; each one adds
 to your binary.
 
+**BIGO is Android only**, which is why the Gradle file lists one network more
+than the Podfile. It also needs cleartext traffic to `127.0.0.1`, because the
+BIGO Ads SDK serves some creative assets from a loopback server on the device:
+that is what `android/app/src/main/res/xml/network_security_config.xml` is for,
+and the `<application>` element references it. Drop the adapter and you can drop
+both. See the
+[BIGO adapter page](https://docs.cloudx.io/en/android/adapters/bigo/overview).
+
 ## Running
 
 ```sh
@@ -162,7 +172,7 @@ diagnostic.
 
 | Line | Meaning |
 |---|---|
-| `CloudX` / `AdMob` | That side's last event: `loading`, `loaded: <network> $<price>`, `load failed: ...`, `showing`, `closed`. |
+| `CloudX` / `AdMob` | That side's last event: `loading`, `loaded: <network> $<price>`, `load failed: ...`, `showing`, `closed`. A CloudX failure carries the SDK's own name for the code, so a round that did not fill reads `load failed: No ad available. (NO_FILL[302])` rather than a bare number. |
 | `Arbiter` | `ADMOB (2 bids)`, `CLOUDX (2 bids)`, `no winner (1 bid)`, or `failed: ...`. |
 | `Revenue -> CloudX` | The last AdMob paid event forwarded through `reportRevenueData`, and what that call returned. A `true` does not mean the price was kept; a revenue of 0.0 is discarded. |
 

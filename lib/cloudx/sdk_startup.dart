@@ -5,18 +5,21 @@ import 'package:cloudx_flutter/cloudx.dart';
 import 'package:flutter/foundation.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
+import 'cloudx_failure_text.dart';
 import 'demo_config.dart';
 import 'tracking_gate.dart';
 
 /*
  * Brings both SDKs up, in the order they have to come up in.
  *
- * Copy this file with tracking_gate.dart, which it calls. The order is the
- * whole point of the file and it is not obvious from either SDK's own docs:
- * the ATT prompt has to be answered before CloudX.initialize, because CloudX
- * reads the tracking status at init and never asks for it, and treats "not
- * determined" the same as denied. Initialize first and every request that
- * session goes out without an IDFA and with dnt = 1.
+ * Copy this file with tracking_gate.dart, which it calls, and
+ * cloudx_failure_text.dart, which formats the initialize failure.
+ *
+ * The order is the whole point of the file and it is not obvious from either
+ * SDK's own docs: the ATT prompt has to be answered before CloudX.initialize,
+ * because CloudX reads the tracking status at init and never asks for it, and
+ * treats "not determined" the same as denied. Initialize first and every
+ * request that session goes out without an IDFA and with dnt = 1.
  *
  * Nothing here builds UI. run() reports what happened and the caller decides
  * what to show.
@@ -55,22 +58,20 @@ class SdkStartup {
     });
 
     /*
-     * Caught so this method keeps the promise above. initialize awaits a
-     * platform channel, so a native failure arrives here as a throw rather than
-     * a null, and letting it out would leave the caller's status line sitting
-     * at whatever it was before the call.
+     * initialize does not throw. A failure comes back as a result carrying the
+     * SDK's own error code, its name for that code and a message, which is the
+     * only place this demo can tell a bad app key apart from a network failure,
+     * so it is passed straight through to the status line.
      */
-    CloudXConfiguration? configuration;
-    try {
-      configuration = await CloudX.initialize(appKey: config.appKey);
-    } catch (error) {
-      debugPrint('[CloudXArbiterDemo] CloudX.initialize threw: $error');
-      configuration = null;
+    final initialization = await CloudX.initialize(appKey: config.appKey);
+    final failure = CloudXFailureText.ofInitialization(initialization);
+    if (failure != null) {
+      debugPrint('[CloudXArbiterDemo] CloudX.initialize failed: $failure');
     }
     return SdkStartupResult._(
       tracking: tracking,
       adMobReady: adMobReady,
-      cloudXInitialized: configuration != null,
+      initialization: initialization,
     );
   }
 }
@@ -80,14 +81,32 @@ class SdkStartupResult {
   const SdkStartupResult._({
     required this.tracking,
     required this.adMobReady,
-    this.cloudXInitialized = false,
+    this.initialization,
   });
 
   /// The answer to the ATT prompt. Always `authorized` off iOS.
   final TrackingStatus tracking;
 
-  /// Whether CloudX came up. False whenever [canLoadAds] is false.
-  final bool cloudXInitialized;
+  /*
+   * What CloudX.initialize reported, or null when tracking was refused and it
+   * was never called. Carries the error code, its name and a message on
+   * failure.
+   */
+  final CloudXInitializationResult? initialization;
+
+  /// Whether CloudX came up.
+  bool get cloudXInitialized => initialization?.success ?? false;
+
+  /*
+   * The reason CloudX did not come up, ready to show. Null when it did, and
+   * null when it was never called because tracking was refused - the caller
+   * reports that case from trackingRefused, which says more than the absence
+   * of a result does.
+   */
+  String? get cloudXFailure {
+    final result = initialization;
+    return result == null ? null : CloudXFailureText.ofInitialization(result);
+  }
 
   /*
    * Completes with whether Google Mobile Ads finished initializing, for

@@ -68,6 +68,13 @@ dependencies {
      * shows: here AdMob is an external bid competing against CloudX through the
      * arbiter. Shipping both would make the two bids the same demand.
      */
+    /*
+     * BIGO is Android only; there is no iOS adapter for it, which is why the
+     * Podfile lists one network fewer than this file does. It also needs the
+     * cleartext rule in res/xml/network_security_config.xml, referenced from
+     * the manifest - the adapter does not add that itself.
+     */
+    implementation("io.cloudx:adapter-bigo:6.0.1.0")
     implementation("io.cloudx:adapter-meta:6.22.0.0")
     implementation("io.cloudx:adapter-vungle:7.7.7.0")
     implementation("io.cloudx:adapter-inmobi:11.4.0.1")
