@@ -7,7 +7,13 @@ import 'package:cloudx_flutter/cloudx.dart';
  * same way when only the message is printed, and a bare number says little more
  * unless you already know the table. Since 3.9.0 the SDK carries its own name
  * for the code on both platforms, so a round that did not fill says
- * NO_FILL[302] and a rejected app key says INVALID_APP_KEY[203].
+ * NO_FILL[302] and an ad unit that is wrong for the app key says
+ * INVALID_AD_UNIT[300]. Both of those were seen on Android and iOS.
+ *
+ * Which code a given failure carries is the SDK's business, not this file's:
+ * an app key the backend rejects arrives as NETWORK_CLIENT_ERROR[103] rather
+ * than INVALID_APP_KEY[203], because it is the HTTP response that failed. Read
+ * the name the SDK sent instead of predicting it.
  *
  * The name is what the native SDK reported, not a second table kept here that
  * could drift from it. It is null when the SDK reported a code the plugin

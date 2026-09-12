@@ -46,6 +46,14 @@ class TrackingGate {
     return status;
   }
 
+  /*
+   * Reading the state and then attaching the listener looks like a race and is
+   * not one: there is no await between the two, and Dart runs an event-loop
+   * turn only at a suspension point, so no lifecycle message can be delivered
+   * in between. The other half is Flutter's own behaviour - AppLifecycleListener
+   * calls onResume unconditionally on the transition to resumed, including from
+   * a null previous state, so a first-ever state of resumed still fires it.
+   */
   static Future<void> _waitUntilActive() async {
     final binding = WidgetsBinding.instance;
     if (binding.lifecycleState == AppLifecycleState.resumed) {
