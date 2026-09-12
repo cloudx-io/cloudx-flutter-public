@@ -4,9 +4,10 @@ A working Trusted Arbiter integration for interstitials. CloudX and AdMob load
 in parallel, both fills become bids, and `CloudX.arbiter` decides which one is
 shown. Companion to [docs.cloudx.io](https://docs.cloudx.io/en/flutter).
 
-Rewarded ads follow the same flow with one extra callback, and banners are a
-different (inline) flow, so neither is repeated here. Interstitial is the whole
-demo.
+Rewarded ads follow the same flow with one extra callback. Banners are a
+different shape entirely: `CloudX.createBanner` places a view at a fixed screen
+position and refreshes it on its own, with no arbiter round. Neither is
+repeated here; interstitial is the whole demo.
 
 ## What Trusted Arbiter is
 
