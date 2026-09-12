@@ -120,6 +120,15 @@ Details worth knowing:
    asks for it, and treats "not determined" the same as denied. This app asks
    before initializing and refuses to continue when the answer is no.
 
+   <img src="docs/images/att-prompt.png" width="260" alt="The iOS tracking prompt shown while the CloudX SDK row still reads not initialized">
+
+   The prompt is answered while `CloudX SDK` still reads `not initialized`. That
+   order is the point: initialize first and every request that session goes out
+   without an IDFA and with `dnt = 1`.
+5. **Set your Signing Team in Xcode** before an iOS device or archive build. The
+   project ships with no `DEVELOPMENT_TEAM` on purpose, so signing stays on
+   automatic and resolves to your own team.
+
 > The ad unit ids checked in here belong to the public CloudX sample app
 > (`io.cloudx.sample`), and the AdMob ids are Google's public test units.
 > Replace all of them.
@@ -136,9 +145,6 @@ Details worth knowing:
 
 Dart 3.12 and Flutter 3.44 are the floors, set by `webview_flutter_android` and
 `webview_flutter_wkwebview`, which `google_mobile_ads` 9.1.0 pulls in.
-
-The Xcode project carries no `DEVELOPMENT_TEAM`, so signing stays on automatic
-and picks your own team. Set it in Xcode before a device or archive build.
 
 **`CloudXGoogleWaterfallAdapter` / `io.cloudx:adapter-googlewaterfall` is
 deliberately absent.** It runs AdMob demand *inside* the CloudX auction, which
@@ -170,6 +176,9 @@ flutter run
 
 Every status line names the platform it came from, so the screen doubles as the
 diagnostic.
+
+<img src="docs/images/arbiter-screen.png" width="260" alt="The demo screen after one round: CloudX loaded at 0.0005, AdMob closed, arbiter ADMOB with 2 bids, revenue reported">
+<img src="docs/images/interstitial.png" width="260" alt="The AdMob test interstitial shown as the stored arbiter winner">
 
 | Line | Meaning |
 |---|---|
