@@ -15,21 +15,7 @@ dependencies:
   flutter:
     sdk: flutter
 
-  # DEV SETTING - not the published form. The SDK is served from the local pub
-  # host (flutter/scripts/serve-local-pub.py in cloudx-io/mobile) until
-  # cloudx_flutter 3.9.0 is on pub.dev.
-  #
-  # To undo once it is published: replace this whole block with
-  # `cloudx_flutter: ^3.9.0` and run `flutter pub get`. Do NOT revert the
-  # commit that introduced it - pubspec.lock has been rewritten twice since,
-  # so the revert conflicts, and that commit's parent also carries the older
-  # `^3.8.0` pin and the older Dart and Flutter floors. pubspec.lock still
-  # records `url: "http://127.0.0.1:8080"` and a sha256 that only the local
-  # host serves, so regenerating it is the part that cannot be skipped.
-  cloudx_flutter:
-    # ignore: secure_pubspec_urls
-    hosted: http://127.0.0.1:8080
-    version: ^3.9.0
+  cloudx_flutter: ^3.9.0
 
   # AdMob is the second bidder in every arbiter round. Pinned exactly so a
   # clone reproduces the same native graph.

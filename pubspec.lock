@@ -45,8 +45,8 @@ packages:
     dependency: "direct main"
     description:
       name: cloudx_flutter
-      sha256: ef3b19a62ff9ef400ee5ae4cdb90ecccb0c203fe64aaf232521b0938d8bfb2ed
-      url: "http://127.0.0.1:8080"
+      sha256: "6feaf59e3878431955b04b0845d195061273cee00411b7e2befabfcfcb4dfcb8"
+      url: "https://pub.dev"
     source: hosted
     version: "3.9.0"
   collection:
