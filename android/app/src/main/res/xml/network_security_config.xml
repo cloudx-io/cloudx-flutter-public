@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Required by io.cloudx:adapter-bigo. The BIGO Ads SDK serves some creative
+  ~ assets from a loopback server on the device, so cleartext to 127.0.0.1 has
+  ~ to be permitted or those creatives fail to render.
+  ~
+  ~ Only 127.0.0.1 is opened. If your app already ships a network security
+  ~ configuration, add this domain to it rather than replacing the file.
+-->
+<network-security-config>
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">127.0.0.1</domain>
+    </domain-config>
+</network-security-config>

@@ -1,0 +1,35 @@
+name: cloudx_flutter_public_demo
+description: "Trusted Arbiter interstitial demo for the CloudX Flutter SDK."
+publish_to: 'none'
+
+version: 1.0.0+1
+
+# The floors the resolved graph needs: google_mobile_ads 9.1.0 pulls
+# webview_flutter_android 4.14.1 and webview_flutter_wkwebview 3.26.1, which
+# require Dart 3.12 and Flutter 3.44. pubspec.lock records the same pair.
+environment:
+  sdk: '>=3.12.0 <4.0.0'
+  flutter: ">=3.44.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cloudx_flutter: ^3.9.0
+
+  # AdMob is the second bidder in every arbiter round. Pinned exactly so a
+  # clone reproduces the same native graph.
+  google_mobile_ads: 9.1.0
+
+  # CloudX reads the ATT status but never asks for it, and treats
+  # notDetermined the same as denied. The prompt has to be answered before
+  # initialize, so the app asks for it itself.
+  app_tracking_transparency: ^2.0.4
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
