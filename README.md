@@ -209,10 +209,12 @@ podspec pins it, so the iOS core follows the plugin. On Android
 visible in one place.
 
 **No lockfile is committed.** `pubspec.lock` and `ios/Podfile.lock` are both
-gitignored, because a committed lock replays the versions it recorded and would
-undo every range above on a fresh clone. The trade-off is real and worth
-knowing: the versions this demo resolves can change without a commit here. That
-is the point, and it is also the risk.
+gitignored, because a committed lock replays the resolution it recorded: the
+pub one would hold `cloudx_flutter` where it was, and the CocoaPods one would
+hold every adapter pod. Android is not locked either way, since Gradle resolves
+its `+` ranges on each build and no lockfile here affects that. The trade-off is
+real and worth knowing: the versions this demo resolves can change without a
+commit here. That is the point, and it is also the risk.
 
 The two dependencies that are not CloudX keep their original constraints:
 

@@ -2,11 +2,11 @@ import 'dart:async';
 
 import 'package:cloudx_flutter/cloudx.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import '../cloudx/arbiter_events.dart';
 import '../cloudx/arbiter_interstitial_controller.dart';
 import '../cloudx/demo_config.dart';
+import '../cloudx/mediation_debugger.dart';
 import '../cloudx/sdk_startup.dart';
 
 /*
@@ -205,30 +205,11 @@ class _ArbiterScreenState extends State<ArbiterScreen> {
   }
 
   Future<void> _showMediationDebugger() async {
-    final bool shown;
-    try {
-      shown = await CloudX.showMediationDebugger();
-    } on PlatformException catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Mediation Debugger failed to open: ${e.message}'),
-        ),
-      );
-      return;
-    }
-    if (!mounted || shown) return;
+    final failure = await MediationDebugger.show();
+    if (!mounted || failure == null) return;
 
-    /*
-     * showMediationDebugger answers false rather than throwing when the SDK is
-     * not initialized yet, so a false is a state to report, not an error.
-     */
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text(
-          'Initialize CloudX before opening the Mediation Debugger.',
-        ),
-      ),
+      SnackBar(content: Text(failure)),
     );
   }
 
