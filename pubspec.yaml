@@ -5,8 +5,9 @@ publish_to: 'none'
 version: 1.0.0+1
 
 # The floors the resolved graph needs: google_mobile_ads 9.1.0 pulls
-# webview_flutter_android 4.14.1 and webview_flutter_wkwebview 3.26.1, which
-# require Dart 3.12 and Flutter 3.44. pubspec.lock records the same pair.
+# webview_flutter_android and webview_flutter_wkwebview, which require Dart 3.12
+# and Flutter 3.44. Their own versions are not named here, because no lockfile is
+# committed and they move with a fresh resolve.
 environment:
   sdk: '>=3.12.0 <4.0.0'
   flutter: ">=3.44.0"
@@ -15,7 +16,7 @@ dependencies:
   flutter:
     sdk: flutter
 
-  cloudx_flutter: ^3.9.0
+  cloudx_flutter: ^3.10.0
 
   # AdMob is the second bidder in every arbiter round. Pinned exactly so a
   # clone reproduces the same native graph.

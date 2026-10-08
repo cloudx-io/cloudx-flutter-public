@@ -6,7 +6,14 @@ plugins {
 
 android {
     namespace = "io.cloudx.cloudx_flutter_public_demo"
-    compileSdk = flutter.compileSdkVersion
+    /*
+     * io.cloudx:adapter-meta needs API 36, because Meta Audience Network
+     * 6.22.0 depends on androidx.browser 1.9.0. Flutter 3.47 already supplies
+     * 36; maxOf keeps tracking Flutter upward on newer versions while holding
+     * the floor on the older ones this demo still invites. targetSdk is
+     * unaffected.
+     */
+    compileSdk = maxOf(flutter.compileSdkVersion, 36)
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
@@ -54,9 +61,14 @@ flutter {
 dependencies {
     /*
      * The cloudx_flutter plugin already brings io.cloudx:sdk transitively. It is
-     * declared here as well so the version is visible and pinned in one place.
+     * declared here as well so the version is visible in one place.
+     *
+     * Every CloudX dependency is declared by major version and resolves to the
+     * newest release on that line, so the demo does not go stale between
+     * releases. Gradle has no optimistic operator; "4.+" is its equivalent of
+     * the Podfile's "~> 4.0".
      */
-    implementation("io.cloudx:sdk:4.7.0")
+    implementation("io.cloudx:sdk:4.+")
 
     /*
      * Adapters version independently of the SDK, on a
@@ -69,22 +81,27 @@ dependencies {
      * arbiter. Shipping both would make the two bids the same demand.
      */
     /*
-     * BIGO is Android only; there is no iOS adapter for it, which is why the
-     * Podfile lists one network fewer than this file does. It also needs the
-     * cleartext rule in res/xml/network_security_config.xml, referenced from
-     * the manifest - the adapter does not add that itself.
+     * BIGO is in this file but not in the Podfile, which is why the Podfile
+     * lists one network fewer. An iOS adapter does exist, but with that pod
+     * installed the Flutter tool drops arm64 from Simulator builds, and the
+     * resulting x86_64-only Runner will not install on an Apple Silicon
+     * simulator. Test BIGO on a physical iOS device.
+     *
+     * On Android it needs the cleartext rule in
+     * res/xml/network_security_config.xml, referenced from the manifest - the
+     * adapter does not add that itself.
      */
-    implementation("io.cloudx:adapter-bigo:6.0.1.0")
-    implementation("io.cloudx:adapter-meta:6.22.0.0")
-    implementation("io.cloudx:adapter-vungle:7.7.7.0")
-    implementation("io.cloudx:adapter-inmobi:11.4.0.1")
-    implementation("io.cloudx:adapter-mintegral:17.1.71.1")
-    implementation("io.cloudx:adapter-unityads:4.19.0.1")
-    implementation("io.cloudx:adapter-magnite:1.0.0.1")
-    implementation("io.cloudx:adapter-moloco:4.11.0.0")
-    implementation("io.cloudx:adapter-verve:3.9.0.1")
-    implementation("io.cloudx:adapter-digitalturbine:8.4.7.1")
-    implementation("io.cloudx:adapter-pangle:8.2.0.4.0")
-    implementation("io.cloudx:adapter-mobilefuse:1.12.0.0")
-    implementation("io.cloudx:adapter-taurusx:1.18.3.0")
+    implementation("io.cloudx:adapter-bigo:6.+")
+    implementation("io.cloudx:adapter-meta:6.+")
+    implementation("io.cloudx:adapter-vungle:7.+")
+    implementation("io.cloudx:adapter-inmobi:11.+")
+    implementation("io.cloudx:adapter-mintegral:17.+")
+    implementation("io.cloudx:adapter-unityads:4.+")
+    implementation("io.cloudx:adapter-magnite:1.+")
+    implementation("io.cloudx:adapter-moloco:4.+")
+    implementation("io.cloudx:adapter-verve:3.+")
+    implementation("io.cloudx:adapter-digitalturbine:8.+")
+    implementation("io.cloudx:adapter-pangle:8.+")
+    implementation("io.cloudx:adapter-mobilefuse:1.+")
+    implementation("io.cloudx:adapter-taurusx:1.+")
 }

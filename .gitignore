@@ -46,3 +46,9 @@ app.*.map.json
 
 # Widget Preview related
 .widget_preview/
+
+# No lockfile is committed. A committed lock replays the versions it recorded,
+# which would undo the major-version ranges in pubspec.yaml, ios/Podfile and
+# android/app/build.gradle.kts. See the Versions section of README.md.
+pubspec.lock
+ios/Podfile.lock

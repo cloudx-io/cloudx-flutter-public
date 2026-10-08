@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cloudx_flutter/cloudx.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../cloudx/arbiter_events.dart';
 import '../cloudx/arbiter_interstitial_controller.dart';
@@ -12,7 +13,7 @@ import '../cloudx/sdk_startup.dart';
  * Demo-only UI. Ignore this file when reading the integration: every CloudX and
  * AdMob call lives under lib/cloudx/, and nothing here is meant to be copied.
  * All this screen does is turn the controller's callbacks into status lines and
- * decide when the two buttons are live.
+ * decide when the buttons are live.
  */
 class ArbiterScreen extends StatefulWidget {
   const ArbiterScreen({super.key});
@@ -203,6 +204,34 @@ class _ArbiterScreenState extends State<ArbiterScreen> {
     _load();
   }
 
+  Future<void> _showMediationDebugger() async {
+    final bool shown;
+    try {
+      shown = await CloudX.showMediationDebugger();
+    } on PlatformException catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Mediation Debugger failed to open: ${e.message}'),
+        ),
+      );
+      return;
+    }
+    if (!mounted || shown) return;
+
+    /*
+     * showMediationDebugger answers false rather than throwing when the SDK is
+     * not initialized yet, so a false is a state to report, not an error.
+     */
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text(
+          'Initialize CloudX before opening the Mediation Debugger.',
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final controller = _controller;
@@ -235,8 +264,14 @@ class _ArbiterScreenState extends State<ArbiterScreen> {
             _row('Arbiter', _arbiter),
             _row('Revenue -> CloudX', _revenue),
             const SizedBox(height: 24),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+            /*
+             * Wrap, not Row: three buttons do not fit on one line at phone
+             * width, and the winner's name makes the middle one wider still.
+             */
+            Wrap(
+              alignment: WrapAlignment.center,
+              spacing: 12,
+              runSpacing: 12,
               children: [
                 ElevatedButton(
                   onPressed: canLoad ? _load : null,
@@ -244,7 +279,6 @@ class _ArbiterScreenState extends State<ArbiterScreen> {
                     (controller?.isBusy ?? false) ? 'Loading...' : 'Load both',
                   ),
                 ),
-                const SizedBox(width: 12),
                 ElevatedButton(
                   onPressed: winner == null || (controller?.isShowing ?? false)
                       ? null
@@ -252,6 +286,10 @@ class _ArbiterScreenState extends State<ArbiterScreen> {
                   child: Text(
                     winner == null ? 'Show winner' : 'Show winner ($winner)',
                   ),
+                ),
+                ElevatedButton(
+                  onPressed: _ready ? _showMediationDebugger : null,
+                  child: const Text('Debugger'),
                 ),
               ],
             ),
