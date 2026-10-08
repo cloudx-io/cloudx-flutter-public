@@ -27,7 +27,7 @@ demo runs as-is.
 
 ```sh
 flutter pub get
-(cd ios && pod install)   # iOS only
+(cd ios && pod install --repo-update)   # iOS only
 flutter run
 ```
 
@@ -35,6 +35,19 @@ Tap **Load both**, wait for both sides to settle, then tap **Show winner**. On
 iOS you will be asked for tracking permission first; see the ATT note under
 [Point it at your own app](#point-it-at-your-own-app) for why that has to come
 before anything else.
+
+**Debugger** opens the CloudX Mediation Debugger. It reports the SDK and plugin
+versions and lists every adapter that is actually linked, with the version each
+one resolved to, which makes it the quickest way to see what the ranges in
+[Versions and adapters](#versions-and-adapters) resolved to on this build. It
+needs the SDK initialized, so it stays disabled until `CloudX SDK` reads
+`initialized`.
+
+Every network in that list will read **Not in server config** here. That is
+expected: the sample dashboard app these ids belong to serves a test bidder
+only, so the adapters are linked but none of them is provisioned. Point the demo
+at [your own app](#point-it-at-your-own-app) and the networks you have
+configured start reporting their real state.
 
 If you want the iOS build on a device or an archive, set your own Signing Team
 in Xcode. The project deliberately ships with no `DEVELOPMENT_TEAM`, so signing
@@ -177,16 +190,51 @@ either way.
 
 ## Versions and adapters
 
+Every CloudX dependency is declared by major version and resolves to the newest
+release on that line, so this demo does not go stale between CloudX releases.
+
+| Pin | Declared as | Example |
+|---|---|---|
+| `cloudx_flutter` | pub caret range | `^3.10.0` (`>= 3.10.0, < 4.0.0`) |
+| Android SDK and adapters | Gradle `+` | `io.cloudx:adapter-vungle:7.+` |
+| iOS adapters | CocoaPods `~>` | `pod 'CloudXVungleAdapter', '~> 7.0'` (`>= 7.0, < 8.0`) |
+
+Two components are what makes the CocoaPods form a major-version range. A
+four-component `~> 7.7.6.0` means `>= 7.7.6.0, < 7.7.7.0`, a patch lock that
+only looks like one.
+
+`CloudXCore` is not declared anywhere in this repo. The `cloudx_flutter`
+podspec pins it, so the iOS core follows the plugin. On Android
+`io.cloudx:sdk:4.+` is declared in `android/app/build.gradle.kts` so the core is
+visible in one place.
+
+**No lockfile is committed.** `pubspec.lock` and `ios/Podfile.lock` are both
+gitignored, because a committed lock replays the resolution it recorded: the
+pub one would hold `cloudx_flutter` where it was, and the CocoaPods one would
+hold every adapter pod. Android is not locked either way, since Gradle resolves
+its `+` ranges on each build and no lockfile here affects that. The trade-off is
+real and worth knowing: the versions this demo resolves can change without a
+commit here. That is the point, and it is also the risk.
+
+The two dependencies that are not CloudX keep their original constraints:
+
 | Pin | Version | Why |
 |---|---|---|
-| `cloudx_flutter` | 3.9.0 | The plugin. Brings the native SDKs with it. |
-| `io.cloudx:sdk` | 4.7.0 | Android native SDK. Declared explicitly so the version is visible in one place. |
-| `CloudXCore` | 3.9.0 | iOS native SDK. |
-| `google_mobile_ads` | 9.1.0 exactly | AdMob is the second bidder. Exact, so a clone reproduces the same native graph. |
+| `google_mobile_ads` | 9.1.0 exactly | AdMob is the second bidder, not the subject. Exact, so a clone reproduces the same native graph. |
 | `app_tracking_transparency` | ^2.0.4 | The ATT prompt. |
 
 Dart 3.12 and Flutter 3.44 are the floors, set by `webview_flutter_android` and
 `webview_flutter_wkwebview`, which `google_mobile_ads` 9.1.0 pulls in.
+
+Two toolchain floors come from the adapters rather than from Flutter:
+
+- **Xcode 26.1** on iOS. `~> 4.0` resolves Unity Ads 4.20.1.0, which fails to
+  link on Xcode 16.x with `Undefined symbol: _swift_coroFrameAlloc`, and
+  `~> 8.0` resolves Digital Turbine 8.4.10.0, which states the same floor.
+- **Android API 36** to compile. `io.cloudx:adapter-meta` needs it, because Meta
+  Audience Network 6.22.0 depends on `androidx.browser` 1.9.0. That is what
+  `compileSdk = maxOf(flutter.compileSdkVersion, 36)` is for; `targetSdk` does
+  not change.
 
 The adapter list in `android/app/build.gradle.kts` and `ios/Podfile` is the full
 CloudX set, so you can see the shape of it. **Take only the networks your
@@ -198,13 +246,19 @@ is the opposite of what this demo shows: here AdMob is an external bid competing
 against CloudX through the arbiter. Shipping both would make the two bids the
 same demand.
 
-**BIGO is Android only**, which is why the Gradle file lists one network more
-than the Podfile. It also needs cleartext traffic to `127.0.0.1`, because the
-BIGO Ads SDK serves some creative assets from a loopback server on the device:
-that is what `android/app/src/main/res/xml/network_security_config.xml` is for,
-and the `<application>` element references it. Drop the adapter and you can drop
-both. See the
-[BIGO adapter page](https://docs.cloudx.io/en/android/adapters/bigo/overview).
+**BIGO is in the Gradle file but not in the Podfile**, which is why the Gradle
+file lists one network more. An iOS adapter does exist, but with
+`CloudXBigoAdapter` installed the Flutter tool drops arm64 from Simulator
+builds, and the resulting x86_64-only Runner will not install on an Apple
+Silicon simulator. This demo has to run as-is on `flutter run`, so the pod stays
+out; test BIGO on a physical iOS device.
+
+On Android it also needs cleartext traffic to `127.0.0.1`, because the BIGO Ads
+SDK serves some creative assets from a loopback server on the device: that is
+what `android/app/src/main/res/xml/network_security_config.xml` is for, and the
+`<application>` element references it. Drop the adapter and you can drop both.
+See the [BIGO adapter
+page](https://docs.cloudx.io/en/android/adapters/bigo/overview).
 
 ## Getting help
 

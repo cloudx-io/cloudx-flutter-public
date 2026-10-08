@@ -44,19 +44,38 @@ target 'Runner' do
   # frees google_mobile_ads from having to match that adapter's exact
   # Google-Mobile-Ads-SDK pin, which is why this app can be on the current
   # google_mobile_ads release.
-  pod 'CloudXCore', '~> 3.9.0'
-  pod 'CloudXMetaAdapter', '~> 6.22.0.0'
-  pod 'CloudXVungleAdapter', '~> 7.7.6.0'
-  pod 'CloudXInMobiAdapter', '~> 11.4.1.0'
-  pod 'CloudXMintegralAdapter', '~> 8.1.6.0'
-  pod 'CloudXUnityAdsAdapter', '~> 4.19.0.0'
-  pod 'CloudXMagniteAdapterV2', '~> 1.0.0.1'
-  pod 'CloudXMobileFuseAdapter', '~> 1.11.0.1'
-  pod 'CloudXMolocoAdapter', '~> 4.8.0.0'
-  pod 'CloudXVerveAdapter', '~> 3.9.0.0'
-  pod 'CloudXDigitalTurbineAdapter', '~> 8.4.8.0'
-  pod 'CloudXPangleAdapter', '~> 8.2.0.7.0'
-  pod 'CloudXTaurusXAdapter', '~> 1.18.2.0'
+  #
+  # CloudXCore is deliberately not declared here. The cloudx_flutter podspec
+  # already pins it, so the core follows the plugin and there is no second
+  # place to update. Declaring it again would only create a conflict: the
+  # previous '~> 3.9.0' here meant '>= 3.9.0, < 3.10.0', which the 3.10.0
+  # plugin's own '~> 3.10.0' cannot satisfy.
+  #
+  # Each adapter is declared by major version with the optimistic operator, so
+  # the demo resolves the newest release on that line instead of going stale
+  # between CloudX releases. '~> 7.0' is '>= 7.0, < 8.0'. Note that two
+  # components are what makes it a major-version range: a four-component
+  # '~> 7.7.6.0' is '>= 7.7.6.0, < 7.7.7.0', a patch lock that only looks
+  # like one.
+  #
+  # CloudXBigoAdapter is absent for a Flutter-specific reason, not because it
+  # does not exist. With that pod installed, the Flutter tool writes
+  # EXCLUDED_ARCHS[sdk=iphonesimulator*] into Flutter/Generated.xcconfig, the
+  # Runner is then built x86_64 only, and an Apple Silicon simulator refuses to
+  # install it. This demo has to run as-is on `flutter run`, so it stays out;
+  # test BIGO on a physical device.
+  pod 'CloudXMetaAdapter', '~> 6.0'
+  pod 'CloudXVungleAdapter', '~> 7.0'
+  pod 'CloudXInMobiAdapter', '~> 11.0'
+  pod 'CloudXMintegralAdapter', '~> 8.0'
+  pod 'CloudXUnityAdsAdapter', '~> 4.0'
+  pod 'CloudXMagniteAdapterV2', '~> 1.0'
+  pod 'CloudXMobileFuseAdapter', '~> 1.0'
+  pod 'CloudXMolocoAdapter', '~> 4.0'
+  pod 'CloudXVerveAdapter', '~> 3.0'
+  pod 'CloudXDigitalTurbineAdapter', '~> 8.0'
+  pod 'CloudXPangleAdapter', '~> 8.0'
+  pod 'CloudXTaurusXAdapter', '~> 1.0'
 
   target 'RunnerTests' do
     inherit! :search_paths
